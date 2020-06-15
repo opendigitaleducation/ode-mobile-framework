@@ -7,6 +7,9 @@ echo "Prepare project..."
 [ -z "$APPCENTER_PWD" ] && echo "Need to set APPCENTER_PWD" && exit 1;
 npm run appcenter:config
 echo "Ready for build!"
+# printenv
+echo "Print APPEXTENSIONPROVISIONSECUREFILES"
+echo $APPEXTENSIONPROVISIONSECUREFILES
 # if [ ! -z "${APPCENTER_ANDROID_MODULE}" ];
 # then
 #     echo "=== Generate Android JS bundle ==="

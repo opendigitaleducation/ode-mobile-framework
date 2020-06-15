@@ -20,6 +20,19 @@
 	<string>1.1.2-SNAPSHOT</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string></string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.ode.appe</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>01010200</string>
 	<key>LSRequiresIPhoneOS</key>
@@ -39,6 +52,8 @@
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>$(PRODUCT_NAME) would like access to your media library</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>$(PRODUCT_NAME) would like to use bluetooth connection</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>$(PRODUCT_NAME) requires Bluetooth to connect to our hardware.</string>
 	<key>NSCalendarsUsageDescription</key>
@@ -59,8 +74,6 @@
 	<string>$(PRODUCT_NAME) would like access to your photo gallery to send photos to your educational network.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>$(PRODUCT_NAME) would like to use speech recognition</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>$(PRODUCT_NAME) would like to use bluetooth connection</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>icomoon.ttf</string>

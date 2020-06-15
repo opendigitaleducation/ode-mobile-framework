@@ -7,3 +7,5 @@ then
     cp build/outputs/mapping/release/* $APPCENTER_OUTPUT_DIRECTORY/
 fi
 echo "=== Post build action finished ==="
+echo "Print $ APPEXTENSIONPROVISIONSECUREFILES"
+echo $APPEXTENSIONPROVISIONSECUREFILES

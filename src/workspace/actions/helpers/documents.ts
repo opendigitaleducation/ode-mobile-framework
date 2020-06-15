@@ -150,11 +150,15 @@ export const uploadDocument = (dispatch: any, content: ContentUri[], parentId?: 
 
   const url = `${Conf.currentPlatform.url}/workspace/document?${parentIdParam}${protectedParam}quality=1&thumbnail=120x120&thumbnail=100x100&thumbnail=290x290&thumbnail=381x381&thumbnail=1600x0`;
 
+  const filePrefixRegex = /^file:\/\/(.*)/;
+
   dispatch(progressInitAction());
 
-  const response = content.map((item, index) =>
-    RNFB.fetch("POST", url, headers, [
-      { name: `document${index}`, type: item.mime, filename: item.name, data: RNFB.wrap(item.uri) },
+  const response = content.map((item, index) => {
+    const finalUri = filePrefixRegex.test(item.uri) ? filePrefixRegex.exec(item.uri)[1] : item.uri;
+
+    return RNFB.fetch("POST", url, headers, [
+      { name: `document${index}`, type: item.mime, filename: item.name, data: RNFB.wrap(finalUri) },
     ])
       .uploadProgress({ interval: 100 }, (written, total) => {
         dispatch(progressAction((written / total) * 100));
@@ -168,8 +172,8 @@ export const uploadDocument = (dispatch: any, content: ContentUri[], parentId?: 
         } else {
           return Promise.reject(response.data);
         }
-      })
-  );
+      });
+  });
 
   return Promise.all(response);
 };

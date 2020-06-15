@@ -172,12 +172,31 @@ async function _updateAppIds(ode) {
     };
     gradleProperties = gradleProperties.replace(/(APPID=)(.*)/, "$1" + appidAndroid).replace(/(APPNAME=)(.*)/, "$1" + toUnicode(appname))
     await writeFile(gradlePropertiesPath, gradleProperties);
-    //update info.plist
+    //update app info.plist
     const infoPlistPath = path.resolve(__dirname, ode["properties"]["ios"]);
     let infoPlist = await readFile(infoPlistPath, { encoding: "utf-8" });
     const appnameIOS = appname.replace(" ","&#x2007;");//https://stackoverflow.com/questions/46337691/bundle-display-name-missing-space-characters
-    infoPlist = infoPlist.replace(/(<key>CFBundleIdentifier<\/key>\s*<string>)(.*)(<\/string>)/, "$1" + appidIOS + "$3").replace(/(<key>CFBundleDisplayName<\/key>\s*<string>)(.*)(<\/string>)/, "$1" + appnameIOS + "$3")
+    infoPlist = infoPlist
+        .replace(/(<key>CFBundleIdentifier<\/key>\s*<string>)(.*)(<\/string>)/, "$1" + appidIOS + "$3") // App ID
+        .replace(/(<key>CFBundleDisplayName<\/key>\s*<string>)(.*)(<\/string>)/, "$1" + appnameIOS + "$3") // App Name
+        .replace(/(<key>CFBundleURLTypes<\/key>\s*<array>\s*<dict>[\s\S]*<key>CFBundleURLSchemes<\/key>\s*<array>\s*<string>)(.*)(\s*<\/string>\s*<\/array>\s*<\/dict>\s*<\/array>)/, "$1" + appidIOS + "$3"); // Protocol ID
     await writeFile(infoPlistPath, infoPlist);
+    //update share-intent info.plist
+    const shareIntentInfoPlistPath = path.resolve(__dirname, ode["properties"]["ios-share-intent"])
+    let shareIntentInfoPlist = await readFile(shareIntentInfoPlistPath, { encoding: "utf-8" })
+    shareIntentInfoPlist = shareIntentInfoPlist
+        .replace(/(<key>CFBundleIdentifier<\/key>\s*<string>)(.*)(<\/string>)/, "$1" + appidIOS + ".share-intent" + "$3"); // Share intent ID
+    await writeFile(shareIntentInfoPlistPath, shareIntentInfoPlist);
+    //update project.pbxproj
+    const pbxprojPath = path.resolve(__dirname, ode["properties"]["ios-pbxproj"])
+    let pbxproj = await readFile(pbxprojPath, { encoding: "utf-8" })
+    pbxproj = pbxproj
+        .replace(/(983A80FF246040EE00032774 \/\* Debug \*\/[\s\S]*?{[\s\S]*?INFOPLIST_FILE = "share-intent\/Info.plist";[\s\S]*?PRODUCT_BUNDLE_IDENTIFIER = ")(.*)("[\s\S]*?})/, "$1" + appidIOS + ".share-intent" + "$3") // Share intent ID
+        .replace(/(983A8100246040EE00032774 \/\* Release \*\/[\s\S]*?{[\s\S]*?INFOPLIST_FILE = "share-intent\/Info.plist";[\s\S]*?PRODUCT_BUNDLE_IDENTIFIER = ")(.*)("[\s\S]*?})/, "$1" + appidIOS + ".share-intent" + "$3"); // Share intent ID
+    // console.log("==== Generated PBXPROJ ====");
+    // console.log(pbxproj);
+    // console.log("==== End Generated PBXPROJ ====");
+    await writeFile(pbxprojPath, pbxproj);
 }
 function _overrideFileListAbsolute(name) {
     const overridePath = _overridePathFor(name);
