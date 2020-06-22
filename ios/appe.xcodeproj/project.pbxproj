@@ -43,6 +43,7 @@
 		983A80F6246040EE00032774 /* ShareViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 983A80F5246040EE00032774 /* ShareViewController.m */; };
 		983A80F9246040EE00032774 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 983A80F7246040EE00032774 /* MainInterface.storyboard */; };
 		983A80FD246040EE00032774 /* share-intent.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 983A80F2246040EE00032774 /* share-intent.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		98EF2CDF24A0EADA003A5A5E /* share.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 98EF2CDE24A0EAD9003A5A5E /* share.jsbundle */; };
 		F4E5907E255D7AE2EF574802 /* libPods-appe.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D7C348A70AB59A8B9E317550 /* libPods-appe.a */; };
 /* End PBXBuildFile section */
 
@@ -131,6 +132,7 @@
 		983A80F5246040EE00032774 /* ShareViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ShareViewController.m; sourceTree = "<group>"; };
 		983A80F8246040EE00032774 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		983A80FA246040EE00032774 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		98EF2CDE24A0EAD9003A5A5E /* share.jsbundle */ = {isa = PBXFileReference; lastKnownFileType = text; name = share.jsbundle; path = "share-intent/share.jsbundle"; sourceTree = "<group>"; };
 		9FE6B26FB3FF06B041B3343E /* libPods-appe-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-appe-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBC5A901FD5D4DB788F447EF /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		BD800027C1EF4F3A912ECE47 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
@@ -290,6 +292,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				98EF2CDE24A0EAD9003A5A5E /* share.jsbundle */,
 				74264AB722DF7D2E00A0E2A6 /* Resources */,
 				13B07FAE1A68108700A75B9A /* appe */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -435,6 +438,7 @@
 				AAB096233077ECF3624D09A2 /* [CP] Check Pods Manifest.lock */,
 				983A80EE246040EE00032774 /* Sources */,
 				983A80EF246040EE00032774 /* Frameworks */,
+				98C6D01424A0E8C700E4DE14 /* Bundle Share Extension */,
 				983A80F0246040EE00032774 /* Resources */,
 				8E33FC2D918454330AE3A3EA /* [CP] Copy Pods Resources */,
 			);
@@ -567,6 +571,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				98EF2CDF24A0EADA003A5A5E /* share.jsbundle in Resources */,
 				983A80F9246040EE00032774 /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -787,6 +792,24 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-appe-share-intent/Pods-appe-share-intent-resources.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		98C6D01424A0E8C700E4DE14 /* Bundle Share Extension */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Bundle Share Extension";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "react-native bundle --entry-file ./index.intent.js --platform ios --dev false --bundle-output ./ios/share-intent/share.jsbundle --assets-dest ios/";
 		};
 		AAB096233077ECF3624D09A2 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

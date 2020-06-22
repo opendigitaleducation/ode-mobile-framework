@@ -21,7 +21,7 @@
   #if DEBUG
     jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index.intent" fallbackResource:nil];
   #else
-    jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+    jsCodeLocation = [[NSBundle mainBundle] URLForResource:@"share" withExtension:@"jsbundle"];
   #endif
 
   RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
