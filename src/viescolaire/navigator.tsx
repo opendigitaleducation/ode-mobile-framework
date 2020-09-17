@@ -5,10 +5,17 @@ import CompetencesNavigator from "./competences/navigator";
 import Declaration from "./presences/containers/Declaration";
 import PresencesNavigator from "./presences/navigator";
 import Dashboard from "./viesco/containers/Dashboard";
+import EdtNavigator from "./edt/navigator";
 
 export default createStackNavigator({
   Dashboard,
   Declaration,
+  edt: {
+    screen: EdtNavigator,
+    navigationOptions: {
+      header: null,
+    },
+  },
   cdt: {
     screen: HomeworkNavigator,
     navigationOptions: {
