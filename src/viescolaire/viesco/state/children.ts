@@ -49,6 +49,14 @@ export const getSelectedChildStructure = (globalState: any) => {
   );
 };
 
+export const getSelectedChildGroup = (globalState: any) => {
+  const child = getSelectedChild(globalState);
+  const infos = getSessionInfo();
+  const childSchool = infos.childrenStructure?.find(school => school.children.some(c => c.id === child.id));
+  const classesNames = childSchool?.children.find(c => c.id === child.id)?.classesNames;
+  return classesNames && classesNames.length > 0 ? classesNames[0] : undefined;
+};
+
 // THE ACTION TYPES -------------------------------------------------------------------------------
 
 export const selectChildActionType = viescoConfig.createActionType("SELECTCHILD");

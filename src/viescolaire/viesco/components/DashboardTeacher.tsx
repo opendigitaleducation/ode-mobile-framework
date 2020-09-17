@@ -5,12 +5,12 @@ import { View, StyleSheet, Image } from "react-native";
 import { CommonStyles } from "../../../styles/common/styles";
 import ConnectionTrackingBar from "../../../ui/ConnectionTrackingBar";
 import { PageContainer } from "../../../ui/ContainerContent";
-import TouchableOpacity from "../../../ui/CustomTouchableOpacity";
+//import TouchableOpacity from "../../../ui/CustomTouchableOpacity";
 import { Text } from "../../../ui/text";
 import CallList from "../../presences/containers/TeacherCallList";
 import { BottomColoredItem } from "../components/Item";
 import StructurePicker from "../containers/StructurePicker";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 
 const style = StyleSheet.create({
   dashboardPart: { paddingVertical: 8, paddingHorizontal: 15 },
@@ -95,11 +95,10 @@ export default props => (
       <View style={style.dashboardPart}>
         <View style={style.grid}>
           <ImageButton
-            onPress={() => true}
+            onPress={() => props.navigation.navigate("Timetable")}
             text={I18n.t("viesco-timetable")}
             color="#162EAE"
             imageSrc={require("../../../../assets/viesco/edt.png")}
-            disabled
           />
           <ImageButton
             onPress={() => true}

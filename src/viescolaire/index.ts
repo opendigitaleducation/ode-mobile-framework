@@ -7,12 +7,13 @@ import viesco from "./viesco/reducers";
 import cdt from "./cdt/reducers";
 import competences from "./competences/reducers";
 import presences from "./presences/reducers";
+import edt from "./edt/reducers";
 
 // Main component
 export const root = mainComp;
 
 // Reducer
-export const reducer = combineReducers({ viesco, cdt, presences, competences });
+export const reducer = combineReducers({ viesco, cdt, presences, competences, edt });
 
 // Route
 export const route = config.createRoute(root);
