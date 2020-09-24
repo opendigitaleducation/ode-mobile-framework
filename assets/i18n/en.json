@@ -367,6 +367,12 @@
   "zimbra-missing-receiver": "This message must contain at least one recipient",
   "zimbra-message-deleted": "Message deleted",
   "zimbra-message-moved": "Message moved",
+  "zimbra-messages-moved": "Messages moved",
+  "zimbra-signature": "Signature",
+  "zimbra-add": "Add",
+  "zimbra-signature-add": "Add a signature",
+  "zimbra-signature-added": "Signature added with success",
+  "zimbra-signature-use": "Add to all of my future messages.",
 
   "profileTypes": {
     "Guest": "Guest",

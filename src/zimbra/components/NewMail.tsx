@@ -33,6 +33,20 @@ export default class NewMail extends React.PureComponent<any, NewMailContainerSt
     return users;
   };
 
+  updateSignatureMail = () => {
+    const { signatureMail } = this.props;
+    if (signatureMail !== undefined && !signatureMail.isFetching) {
+      let signatureText = "";
+      const signaturePref = signatureMail.data.preference;
+      if (signaturePref !== undefined) {
+        typeof signaturePref === "object"
+          ? (signatureText = signaturePref.signature)
+          : (signatureText = JSON.parse(signaturePref).signature);
+        this.props.updateSignature(signatureText);
+      }
+    }
+  };
+
   constructor(props) {
     super(props);
 
@@ -56,6 +70,7 @@ export default class NewMail extends React.PureComponent<any, NewMailContainerSt
         mail.body && mail.body !== "undefined" ? mail.body.replace(/<br>/g, "\n").slice(5, -6) : body
       );
     this.props.updateStateValue(toUsers, ccUsers, bccUsers, subjectText, bodyText);
+    this.updateSignatureMail();
 
     this.state = {
       mailInfos: mail,
@@ -93,6 +108,7 @@ export default class NewMail extends React.PureComponent<any, NewMailContainerSt
       this.setState({ mailInfos: mail });
       this.props.updateStateValue(toUsers, ccUsers, bccUsers, subjectText, bodyText);
     }
+    this.updateSignatureMail();
   };
 
   public render() {
@@ -109,6 +125,7 @@ export default class NewMail extends React.PureComponent<any, NewMailContainerSt
       searchBcc,
       subject,
       handleInputChange,
+      signature,
     } = this.props;
     return (
       <ScrollView bounces={false} contentContainerStyle={{ flexGrow: 1 }}>
@@ -138,6 +155,10 @@ export default class NewMail extends React.PureComponent<any, NewMailContainerSt
             defaultValue={this.props.body}
             onChangeText={(text: string) => this.props.handleInputChange(text, "body")}
           />
+        </View>
+        <View style={styles.signatureZone}>
+          <Text>--------------------------------------</Text>
+          <Text>{signature}</Text>
         </View>
       </ScrollView>
     );
@@ -260,5 +281,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     elevation: CommonStyles.elevation,
     ...IOSShadowStyle,
+  },
+  signatureZone: {
+    backgroundColor: "white",
+    alignItems: "flex-start",
+    minHeight: 40,
+    paddingHorizontal: 15,
+    marginBottom: 15,
   },
 });
