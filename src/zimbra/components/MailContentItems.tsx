@@ -74,53 +74,101 @@ const IconButton = ({ icon, color, text, onPress }) => {
   );
 };
 
+const HeaderMailInfos = ({
+  mailInfos,
+  setDetailsVisibility,
+  isDetails,
+}: {
+  mailInfos: any;
+  setDetailsVisibility: (v: boolean) => void;
+  isDetails: boolean;
+}) => {
+  return (
+    <Header>
+      <LeftPanel style={{ justifyContent: "flex-start" }}>
+        <BadgeAvatar
+          avatars={findReceiversAvatars(mailInfos.to, mailInfos.from, mailInfos.cc, mailInfos.displayNames)}
+          badgeContent={mailInfos.unread}
+        />
+      </LeftPanel>
+
+      <CenterPanel style={{ marginRight: 0, paddingRight: 0 }}>
+        <Author nb={mailInfos.unread} numberOfLines={1}>
+          {findReceivers2(mailInfos.to, mailInfos.from, mailInfos.cc)
+            .map(r => {
+              const u = mailInfos.displayNames.find(dn => dn[0] === r);
+              return u ? u[1] : I18n.t("unknown-user");
+            })
+            .join(", ")}
+        </Author>
+        <IconButton
+          onPress={setDetailsVisibility}
+          text={I18n.t("zimbra-see_detail")}
+          color="#2A9CC8"
+          icon={!isDetails ? "keyboard_arrow_down" : "keyboard_arrow_down"}
+        />
+      </CenterPanel>
+      {!isDetails ? (
+        <Text>{moment(mailInfos.date).format("LL - LT")}</Text>
+      ) : (
+        <Text>{moment(mailInfos.date).format("dddd LL")}</Text>
+      )}
+    </Header>
+  );
+};
+
 // EXPORTED COMPONENTS
 
-export const HeaderMail = ({ mailInfos }) => {
-  const [isVisible, toggleVisible] = React.useState(false);
+export const HeaderMailDetails = ({
+  mailInfos,
+  setDetailsVisibility,
+}: {
+  mailInfos: any;
+  setDetailsVisibility: (v: boolean) => void;
+}) => {
   const inInbox = mailInfos.systemFolder === "INBOX";
   return (
-    <View style={styles.containerMail}>
-      <Header>
-        <LeftPanel style={{ justifyContent: "flex-start" }}>
-          <BadgeAvatar
-            avatars={findReceiversAvatars(mailInfos.to, mailInfos.from, mailInfos.cc, mailInfos.displayNames)}
-            badgeContent={mailInfos.unread}
-          />
-        </LeftPanel>
+    <View style={[styles.containerMailDetails, styles.shadow]}>
+      <HeaderMailInfos
+        mailInfos={mailInfos}
+        setDetailsVisibility={() => setDetailsVisibility(false)}
+        isDetails={true}
+      />
 
-        <CenterPanel style={{ marginRight: 0, paddingRight: 0 }}>
-          <Author nb={mailInfos.unread} numberOfLines={1}>
-            {findReceivers2(mailInfos.to, mailInfos.from, mailInfos.cc)
-              .map(r => {
-                const u = mailInfos.displayNames.find(dn => dn[0] === r);
-                return u ? u[1] : I18n.t("unknown-user");
-              })
-              .join(", ")}
-          </Author>
-          <IconButton
-            onPress={() => toggleVisible(!isVisible)}
-            text={I18n.t("zimbra-see_detail")}
-            color="#2A9CC8"
-            icon={isVisible ? "keyboard_arrow_up" : "keyboard_arrow_down"}
-          />
-        </CenterPanel>
-        {!isVisible ? (
-          <Text>{moment(mailInfos.date).format("LL - LT")}</Text>
-        ) : (
-          <Text>{moment(mailInfos.date).format("dddd LL")}</Text>
-        )}
-      </Header>
+      <SendersDetails
+        receivers={mailInfos.to}
+        cc={mailInfos.cc}
+        displayNames={mailInfos.displayNames}
+        inInbox={inInbox}
+        sender={mailInfos.from}
+      />
 
-      {isVisible && (
-        <SendersDetails
-          receivers={mailInfos.to}
-          cc={mailInfos.cc}
-          displayNames={mailInfos.displayNames}
-          inInbox={inInbox}
-          sender={mailInfos.from}
-        />
+      {mailInfos.subject && mailInfos.subject.length ? (
+        <View style={{ flexDirection: "row" }}>
+          <Text style={styles.greyColor}>{I18n.t("zimbra-subject")} : </Text>
+          <TextBold> {mailInfos.subject}</TextBold>
+        </View>
+      ) : (
+        <style.View />
       )}
+    </View>
+  );
+};
+
+export const HeaderMail = ({
+  mailInfos,
+  setDetailsVisibility,
+}: {
+  mailInfos: any;
+  setDetailsVisibility: (v: boolean) => void;
+}) => {
+  return (
+    <View style={styles.containerMail}>
+      <HeaderMailInfos
+        mailInfos={mailInfos}
+        setDetailsVisibility={() => setDetailsVisibility(true)}
+        isDetails={false}
+      />
 
       {mailInfos.subject && mailInfos.subject.length ? (
         <View style={{ flexDirection: "row" }}>
@@ -219,6 +267,15 @@ const styles = StyleSheet.create({
   containerMail: {
     padding: 15,
     backgroundColor: "white",
+  },
+  containerMailDetails: {
+    padding: 15,
+    backgroundColor: "white",
+    position: "absolute",
+    zIndex: 9,
+    top: 12,
+    right: 0,
+    left: 0,
   },
   gridButton: {
     flexDirection: "row",
