@@ -101,11 +101,10 @@ export default props => (
             imageSrc={require("../../../../assets/viesco/edt.png")}
           />
           <ImageButton
-            onPress={() => true}
+            onPress={() => props.navigation.navigate("CdtTimetable")}
             text={I18n.t("Homework")}
             color="#2BAB6F"
             imageSrc={require("../../../../assets/viesco/cdt.png")}
-            disabled
           />
         </View>
       </View>
