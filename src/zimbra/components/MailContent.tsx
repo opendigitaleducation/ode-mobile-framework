@@ -8,7 +8,7 @@ import { PageContainer } from "../../ui/ContainerContent";
 import { HtmlContentView } from "../../ui/HtmlContentView";
 import { DraftType } from "../containers/NewMail";
 import { getUserColor } from "../utils/userColor";
-import { RenderPJs, HeaderMail, FooterButton } from "./MailContentItems";
+import { RenderPJs, HeaderMail, HeaderMailDetails, FooterButton } from "./MailContentItems";
 
 const GetTopBarColor = ({ senderId, receiverId }) => {
   const userId = getSessionInfo().userId === senderId ? receiverId : senderId;
@@ -18,6 +18,14 @@ const GetTopBarColor = ({ senderId, receiverId }) => {
 };
 
 export default class MailContent extends React.PureComponent<any, any> {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      detailsVisible: false,
+    };
+  }
+
   private mailFooter() {
     return (
       <View style={styles.containerFooter}>
@@ -76,10 +84,10 @@ export default class MailContent extends React.PureComponent<any, any> {
     );
   }
 
-  private mailHeader() {
+  private mailHeader(setDetailsVisibility: (v: boolean) => void) {
     return (
       <View>
-        <HeaderMail mailInfos={this.props.mail} />
+        <HeaderMail mailInfos={this.props.mail} setDetailsVisibility={setDetailsVisibility} />
       </View>
     );
   }
@@ -95,12 +103,23 @@ export default class MailContent extends React.PureComponent<any, any> {
               {this.props.mail.id && (
                 <GetTopBarColor senderId={this.props.mail.from} receiverId={this.props.mail.to[0]} />
               )}
-              {this.props.mail.id && this.mailHeader()}
+              {this.props.mail.id &&
+                this.mailHeader(v => {
+                  this.setState({ detailsVisible: v });
+                })}
               {this.props.mail.hasAttachment && (
                 <RenderPJs attachments={this.props.mail.attachments} mailId={this.props.mail.id} />
               )}
               {this.props.mail.body !== undefined && this.mailContent()}
               {this.mailFooter()}
+              {this.state.detailsVisible && (
+                <HeaderMailDetails
+                  mailInfos={this.props.mail}
+                  setDetailsVisibility={v => {
+                    this.setState({ detailsVisible: v });
+                  }}
+                />
+              )}
             </View>
           )}
         </SafeAreaView>
@@ -119,6 +138,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 0,
     flexDirection: "column-reverse",
+    backgroundColor: "white",
   },
   scrollContainer: {
     flexGrow: 1,
