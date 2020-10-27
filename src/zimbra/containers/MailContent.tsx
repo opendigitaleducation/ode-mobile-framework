@@ -1,6 +1,6 @@
 import I18n from "i18n-js";
 import * as React from "react";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { View } from "react-native";
 import Toast from "react-native-tiny-toast";
 import { NavigationScreenProp, NavigationActions } from "react-navigation";
 import { connect } from "react-redux";
@@ -8,10 +8,6 @@ import { bindActionCreators } from "redux";
 
 import { standardNavScreenOptions } from "../../navigation/helpers/navScreenOptions";
 import { CommonStyles } from "../../styles/common/styles";
-import { Icon } from "../../ui";
-import { PageContainer } from "../../ui/ContainerContent";
-import { Text } from "../../ui/Typography";
-import { Header as HeaderComponent } from "../../ui/headers/Header";
 import { HeaderAction } from "../../ui/headers/NewHeader";
 import { toggleReadAction, trashMailsAction, deleteMailsAction } from "../actions/mail";
 import { fetchMailContentAction } from "../actions/mailContent";
@@ -21,6 +17,32 @@ import MoveModal from "../containers/MoveToFolderModal";
 import { getMailContentState } from "../state/mailContent";
 
 class MailContentContainer extends React.PureComponent<any, any> {
+  static navigationOptions = ({ navigation }: { navigation: NavigationScreenProp<object> }) => {
+    return standardNavScreenOptions(
+      {
+        title: `${navigation.getParam("subject")}`,
+        headerLeft: () => {
+          const goBack = navigation.getParam("getGoBack", navigation.goBack);
+
+          return <HeaderAction onPress={() => goBack()} name="back" />;
+        },
+        headerRight: () => {
+          const showMenu = navigation.getParam("showMenu");
+
+          return (
+            <View style={{ flexDirection: "row" }}>
+              {showMenu && <HeaderAction style={{ alignSelf: "flex-end" }} onPress={showMenu} name="more_vert" />}
+            </View>
+          );
+        },
+        headerStyle: {
+          backgroundColor: CommonStyles.primary,
+        },
+      },
+      navigation
+    );
+  };
+
   constructor(props) {
     super(props);
 
@@ -31,6 +53,7 @@ class MailContentContainer extends React.PureComponent<any, any> {
     };
   }
   public componentDidMount() {
+    this.props.navigation.setParams({ showMenu: this.showMenu, subject: this.props.navigation.state.params.subject });
     this.props.fetchMailContentAction(this.props.navigation.state.params.mailId);
   }
 
@@ -39,15 +62,6 @@ class MailContentContainer extends React.PureComponent<any, any> {
       this.props.fetchMailContentAction(this.props.navigation.state.params.mailId);
     }
   }
-
-  static navigationOptions = ({ navigation }: { navigation: NavigationScreenProp<object> }) => {
-    return standardNavScreenOptions(
-      {
-        header: null,
-      },
-      navigation
-    );
-  };
 
   public showMenu = () => {
     const { showMenu } = this.state;
@@ -103,7 +117,7 @@ class MailContentContainer extends React.PureComponent<any, any> {
   };
 
   public render() {
-    const { navigation, mail } = this.props;
+    const { mail } = this.props;
     const { showMenu, showModal } = this.state;
     const menuData = [
       { text: I18n.t("zimbra-mark-unread"), icon: "email", onPress: this.markAsRead },
@@ -113,27 +127,7 @@ class MailContentContainer extends React.PureComponent<any, any> {
     ];
     return (
       <>
-        <PageContainer>
-          <HeaderComponent>
-            <HeaderAction onPress={this.goBack} name="back" />
-            <Text
-              style={{
-                alignSelf: "center",
-                color: "white",
-                fontFamily: CommonStyles.primaryFontFamily,
-                fontSize: 16,
-                fontWeight: "400",
-                textAlign: "center",
-                flex: 1,
-              }}>
-              {navigation.state.params.subject}
-            </Text>
-            <TouchableOpacity onPress={this.showMenu}>
-              <Icon name="more_vert" size={24} color="white" style={{ marginRight: 10 }} />
-            </TouchableOpacity>
-          </HeaderComponent>
-          <MailContent {...this.props} delete={this.delete} />
-        </PageContainer>
+        <MailContent {...this.props} delete={this.delete} />
         <MoveModal mail={mail} show={showModal} closeModal={this.closeModal} successCallback={this.mailMoved} />
         <MailContentMenu onClickOutside={this.showMenu} show={showMenu} data={menuData} />
       </>

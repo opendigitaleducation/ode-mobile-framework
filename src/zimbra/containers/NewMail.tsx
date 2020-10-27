@@ -25,9 +25,13 @@ import {
   deleteAttachmentAction,
   forwardMailAction,
 } from "../actions/newMail";
+import { getSignatureAction } from "../actions/signature";
+import MailContentMenu from "../components/MailContentMenu";
 import NewMailComponent from "../components/NewMail";
+import SignatureModal from "../containers/SignatureModal";
 import { ISearchUsers } from "../service/newMail";
 import { getMailContentState, IMail } from "../state/mailContent";
+import { getSignatureState } from "../state/signature";
 
 const entitiesTransformer = new AllHtmlEntities();
 
@@ -48,6 +52,7 @@ interface ICreateMailEventProps {
   addAttachment: (draftId: string, files: any) => void;
   deleteAttachment: (draftId: string, attachmentId: string) => void;
   fetchMailContent: (mailId: string) => void;
+  getSignature: () => any;
   clearContent: () => void;
 }
 
@@ -65,6 +70,9 @@ interface ICreateMailState {
   isPrefilling?: boolean;
   prevBody?: string;
   replyTo?: string;
+  isShownHeaderMenu: boolean;
+  isShownSignatureModal: boolean;
+  signature: string;
 }
 
 type newMail = {
@@ -89,7 +97,7 @@ class NewMailContainer extends React.PureComponent<NewMailContainerProps, ICreat
         headerRight: () => {
           const askForAttachment = navigation.getParam("getAskForAttachment");
           const sendDraft = navigation.getParam("getSendDraft");
-          const deleteDraft = navigation.getParam("getDeleteDraft");
+          const showMenu = navigation.getParam("showHeaderMenu");
 
           return (
             <View style={{ flexDirection: "row" }}>
@@ -97,7 +105,7 @@ class NewMailContainer extends React.PureComponent<NewMailContainerProps, ICreat
                 <HeaderAction style={{ alignSelf: "flex-end" }} onPress={askForAttachment} name="attachment" />
               )}
               {sendDraft && <HeaderAction style={{ alignSelf: "flex-end" }} onPress={sendDraft} name="outbox" />}
-              {deleteDraft && <HeaderAction style={{ alignSelf: "flex-end" }} onPress={deleteDraft} name="delete" />}
+              {showMenu && <HeaderAction style={{ alignSelf: "flex-end" }} onPress={showMenu} name="more_vert" />}
             </View>
           );
         },
@@ -112,7 +120,12 @@ class NewMailContainer extends React.PureComponent<NewMailContainerProps, ICreat
   constructor(props) {
     super(props);
 
-    this.state = { mail: { to: [], cc: [], bcc: [], subject: "", body: "", attachments: [] } };
+    this.state = {
+      mail: { to: [], cc: [], bcc: [], subject: "", body: "", attachments: [] },
+      isShownHeaderMenu: false,
+      isShownSignatureModal: false,
+      signature: "",
+    };
   }
 
   componentDidMount = () => {
@@ -126,6 +139,7 @@ class NewMailContainer extends React.PureComponent<NewMailContainerProps, ICreat
       this.setState({ id: undefined });
       this.saveDraft();
     }
+    this.props.getSignature();
   };
 
   componentDidUpdate = async (prevProps: NewMailContainerProps, prevState) => {
@@ -204,6 +218,7 @@ class NewMailContainer extends React.PureComponent<NewMailContainerProps, ICreat
       if (navParams.params && navParams.params.onGoBack) navParams.params.onGoBack();
       this.props.navigation.goBack();
     },
+    showHeaderMenu: () => this.showMenu(),
   };
 
   getPrefilledMail = () => {
@@ -367,35 +382,84 @@ class NewMailContainer extends React.PureComponent<NewMailContainerProps, ICreat
     }
   };
 
+  addedSignature = async () => {
+    const signatureMail = await this.props.getSignature();
+
+    if (signatureMail !== undefined) {
+      let signatureText = "";
+      const signaturePref = signatureMail.preference;
+      if (signaturePref !== undefined) {
+        typeof signaturePref === "object"
+          ? (signatureText = signaturePref.signature)
+          : (signatureText = JSON.parse(signaturePref).signature);
+        this.setState({ signature: signatureText });
+      }
+    }
+    Toast.show(I18n.t("zimbra-signature-added"), {
+      position: Toast.position.BOTTOM,
+      mask: false,
+      containerStyle: { width: "95%", backgroundColor: "black" },
+    });
+  };
+
+  public showSignatureModal = () => this.setState({ isShownSignatureModal: true });
+
+  public closeSignatureModal = () => this.setState({ isShownSignatureModal: false });
+
+  public showMenu = () => {
+    const { isShownHeaderMenu } = this.state;
+    this.setState({
+      isShownHeaderMenu: !isShownHeaderMenu,
+    });
+  };
+
   public render() {
-    const { isPrefilling, mail } = this.state;
+    const { isPrefilling, mail, signature } = this.state;
     const { attachments, body, ...headers } = mail;
+    const { isShownHeaderMenu, isShownSignatureModal } = this.state;
+    const deleteDraft = this.props.navigation.getParam("getDeleteDraft");
+    const menuData = [
+      { text: I18n.t("zimbra-signature-add"), icon: "pencil", onPress: this.showSignatureModal },
+      { text: I18n.t("zimbra-delete"), icon: "delete", onPress: deleteDraft },
+    ];
 
     return (
-      <NewMailComponent
-        isFetching={this.props.isFetching || !!isPrefilling}
-        headers={headers}
-        onDraftSave={this.saveDraft}
-        onHeaderChange={headers => this.setState(prevState => ({ mail: { ...prevState.mail, ...headers } }))}
-        body={this.state.mail.body.replace(/<br>/gs, "\n")}
-        onBodyChange={body => this.setState(prevState => ({ mail: { ...prevState.mail, body } }))}
-        attachments={
-          this.state.tempAttachment
-            ? [...this.state.mail.attachments, this.state.tempAttachment]
-            : this.state.mail.attachments
-        }
-        onAttachmentChange={attachments => this.setState(prevState => ({ mail: { ...prevState.mail, attachments } }))}
-      />
+      <>
+        <NewMailComponent
+          isFetching={this.props.isFetching || !!isPrefilling}
+          headers={headers}
+          onDraftSave={this.saveDraft}
+          onHeaderChange={headers => this.setState(prevState => ({ mail: { ...prevState.mail, ...headers } }))}
+          body={this.state.mail.body.replace(/<br>/gs, "\n")}
+          onBodyChange={body => this.setState(prevState => ({ mail: { ...prevState.mail, body } }))}
+          attachments={
+            this.state.tempAttachment
+              ? [...this.state.mail.attachments, this.state.tempAttachment]
+              : this.state.mail.attachments
+          }
+          onAttachmentChange={attachments => this.setState(prevState => ({ mail: { ...prevState.mail, attachments } }))}
+          signature={signature}
+        />
+        <MailContentMenu onClickOutside={this.showMenu} show={isShownHeaderMenu} data={menuData} />
+        <SignatureModal
+          signature={this.state.signature}
+          show={isShownSignatureModal}
+          closeModal={this.closeSignatureModal}
+          successCallback={this.addedSignature}
+        />
+      </>
     );
   }
 }
 
 const mapStateToProps = (state: any) => {
   const { isFetching, data } = getMailContentState(state);
+  const signatureMail = getSignatureState(state);
 
   return {
     mail: data,
     isFetching,
+    signatureMail,
   };
 };
 
@@ -411,6 +475,7 @@ const mapDispatchToProps = (dispatch: any) => {
       deleteAttachment: deleteAttachmentAction,
       clearContent: clearMailContentAction,
       fetchMailContent: fetchMailContentAction,
+      getSignature: getSignatureAction,
     },
     dispatch
   );

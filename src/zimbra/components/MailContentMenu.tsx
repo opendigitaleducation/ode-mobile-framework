@@ -50,7 +50,7 @@ const style = StyleSheet.create({
     backgroundColor: "#ffffff",
     position: "absolute",
     right: 0,
-    top: Header.HEIGHT,
+    top: 0,
     zIndex: 10,
     borderRadius: 4,
     shadowColor: "#000",

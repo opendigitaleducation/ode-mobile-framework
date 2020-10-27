@@ -23,6 +23,7 @@ interface NewMailComponentProps {
   onBodyChange: (body: string) => void;
   attachments: any[];
   onAttachmentChange: (attachments: any[]) => void;
+  signature: string;
 }
 
 const styles = StyleSheet.create({
@@ -31,6 +32,13 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     elevation: CommonStyles.elevation,
     ...IOSShadowStyle,
+  },
+  signatureZone: {
+    backgroundColor: "white",
+    alignItems: "flex-start",
+    minHeight: 40,
+    paddingHorizontal: 15,
+    marginBottom: 15,
   },
 });
 
@@ -43,6 +51,7 @@ export default ({
   onBodyChange,
   attachments,
   onAttachmentChange,
+  signature,
 }: NewMailComponentProps) => {
   return (
     <PageContainer>
@@ -59,6 +68,12 @@ export default ({
             onSave={onDraftSave}
           />
           <Body style={{ zIndex: 1 }} value={body} onChange={onBodyChange} onSave={onDraftSave} />
+          {!!signature && (
+            <View style={styles.signatureZone}>
+              <Text>--------------------------------------</Text>
+              <Text>{signature}</Text>
+            </View>
+          )}
         </ScrollView>
       )}
     </PageContainer>
