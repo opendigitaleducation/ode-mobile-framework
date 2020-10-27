@@ -1,6 +1,7 @@
 import { Dispatch } from "redux";
 
 import { createAsyncActionCreators } from "../../infra/redux/async2";
+import { Trackers } from "../../infra/tracker";
 import { signatureService } from "../service/signature";
 import { ISignature, actionTypes } from "../state/signature";
 
@@ -12,6 +13,7 @@ export const dataActions = createAsyncActionCreators<ISignature>(actionTypes);
 
 export function getSignatureAction() {
   return async (dispatch: Dispatch) => {
+    Trackers.trackEvent("Zimbra", "GET SIGNATURE");
     try {
       //dispatch(dataActions.request());
       return await signatureService.getSignature();
@@ -23,6 +25,7 @@ export function getSignatureAction() {
 
 export function putSignatureAction(signatureData: string, isGlobalSignature: boolean) {
   return async (dispatch: Dispatch) => {
+    Trackers.trackEvent("Zimbra", "SEND SIGNATURE");
     try {
       dispatch(dataActions.request());
       const data = await signatureService.putSignature(signatureData, isGlobalSignature);
