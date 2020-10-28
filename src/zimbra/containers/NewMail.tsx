@@ -139,7 +139,7 @@ class NewMailContainer extends React.PureComponent<NewMailContainerProps, ICreat
       this.setState({ id: undefined });
       this.saveDraft();
     }
-    this.props.getSignature();
+    this.setSignatureState();
   };
 
   componentDidUpdate = async (prevProps: NewMailContainerProps, prevState) => {
@@ -153,6 +153,7 @@ class NewMailContainer extends React.PureComponent<NewMailContainerProps, ICreat
       }));
     } else if (this.props.navigation.getParam("mailId") !== undefined && this.state.id === undefined)
       this.setState({ id: this.props.navigation.getParam("mailId") });
+    if (prevState.signature !== this.state.signature) this.setSignatureState();
   };
 
   navigationHeaderFunction = {
@@ -218,7 +219,12 @@ class NewMailContainer extends React.PureComponent<NewMailContainerProps, ICreat
       if (navParams.params && navParams.params.onGoBack) navParams.params.onGoBack();
       this.props.navigation.goBack();
     },
-    showHeaderMenu: () => this.showMenu(),
+    showHeaderMenu: () => {
+      const { isShownHeaderMenu } = this.state;
+      this.setState({
+        isShownHeaderMenu: !isShownHeaderMenu,
+      });
+    },
   };
 
   getPrefilledMail = () => {
@@ -382,7 +388,7 @@ class NewMailContainer extends React.PureComponent<NewMailContainerProps, ICreat
     }
   };
 
-  addedSignature = async () => {
+  setSignatureState = async () => {
     const signatureMail = await this.props.getSignature();
 
     if (signatureMail !== undefined) {
@@ -395,28 +401,17 @@ class NewMailContainer extends React.PureComponent<NewMailContainerProps, ICreat
         this.setState({ signature: signatureText });
       }
     }
-    Toast.show(I18n.t("zimbra-signature-added"), {
-      position: Toast.position.BOTTOM,
-      mask: false,
-      containerStyle: { width: "95%", backgroundColor: "black" },
-    });
   };
 
   public showSignatureModal = () => this.setState({ isShownSignatureModal: true });
 
   public closeSignatureModal = () => this.setState({ isShownSignatureModal: false });
 
-  public showMenu = () => {
-    const { isShownHeaderMenu } = this.state;
-    this.setState({
-      isShownHeaderMenu: !isShownHeaderMenu,
-    });
-  };
-
   public render() {
     const { isPrefilling, mail, signature } = this.state;
     const { attachments, body, ...headers } = mail;
     const { isShownHeaderMenu, isShownSignatureModal } = this.state;
+    const showMenu = this.props.navigation.getParam("showHeaderMenu");
     const deleteDraft = this.props.navigation.getParam("getDeleteDraft");
     const menuData = [
       { text: I18n.t("zimbra-signature-add"), icon: "pencil", onPress: this.showSignatureModal },
@@ -440,12 +435,12 @@ class NewMailContainer extends React.PureComponent<NewMailContainerProps, ICreat
           onAttachmentChange={attachments => this.setState(prevState => ({ mail: { ...prevState.mail, attachments } }))}
           signature={signature}
         />
-        <MailContentMenu onClickOutside={this.showMenu} show={isShownHeaderMenu} data={menuData} />
+        <MailContentMenu onClickOutside={showMenu} show={isShownHeaderMenu} data={menuData} />
         <SignatureModal
-          signature={this.state.signature}
+          signature={signature}
           show={isShownSignatureModal}
           closeModal={this.closeSignatureModal}
-          successCallback={this.addedSignature}
+          successCallback={this.setSignatureState}
         />
       </>
     );

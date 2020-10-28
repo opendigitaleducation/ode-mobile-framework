@@ -1,4 +1,6 @@
+import I18n from "i18n-js";
 import React from "react";
+import Toast from "react-native-tiny-toast";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
@@ -17,18 +19,24 @@ type SignatureModalProps = {
 type MoveToFolderModalState = {
   signature: string;
   isGlobalSignature: boolean;
+  isUpdated: boolean;
 };
 
 class SignatureModal extends React.Component<SignatureModalProps, MoveToFolderModalState> {
   constructor(props) {
     super(props);
 
-    const { signature } = this.props;
     this.state = {
-      signature: signature,
+      signature: "",
       isGlobalSignature: false,
+      isUpdated: false,
     };
   }
+
+  componentDidUpdate = () => {
+    if (!this.state.isUpdated && this.props.signature !== this.state.signature)
+      this.setState({ isUpdated: true, signature: this.props.signature });
+  };
 
   setSignature = (text: string) => {
     this.setState({ signature: text });
@@ -43,13 +51,26 @@ class SignatureModal extends React.Component<SignatureModalProps, MoveToFolderMo
     this.setState({ isGlobalSignature: !isGlobalSignature });
   };
 
-  confirm = () => {
+  confirm = async () => {
     const { putSignature, successCallback } = this.props;
     const { signature, isGlobalSignature } = this.state;
     this.props.closeModal();
 
     if (!signature) return;
-    else putSignature(signature, isGlobalSignature);
+    else {
+      try {
+        await putSignature(signature, isGlobalSignature);
+        Toast.show(I18n.t("zimbra-signature-added"), {
+          position: Toast.position.BOTTOM,
+          mask: false,
+          containerStyle: { width: "95%", backgroundColor: "black" },
+        });
+      } catch (e) {
+        Toast.show(I18n.t("zimbra-signature-error"), {
+          position: Toast.position.BOTTOM,
+        });
+      }
+    }
     successCallback();
   };
 

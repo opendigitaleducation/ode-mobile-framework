@@ -374,6 +374,7 @@
     "zimbra-add": "Ajouter",
     "zimbra-signature-add": "Ajouter une signature",
     "zimbra-signature-added": "Signature ajoutée avec succès",
+    "zimbra-signature-error": "Echec de l'ajout de la signature",
     "zimbra-signature-use": "Ajouter à tous mes futurs messages.",
 
     "profileTypes": {

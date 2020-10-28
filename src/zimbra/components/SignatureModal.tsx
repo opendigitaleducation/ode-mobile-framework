@@ -1,6 +1,6 @@
 import I18n from "i18n-js";
 import * as React from "react";
-import { View, StyleSheet, CheckBox } from "react-native";
+import { View, StyleSheet, CheckBox, Dimensions } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
 import { DialogButtonCancel, DialogButtonOk } from "../../ui/ConfirmDialog";
@@ -52,6 +52,7 @@ export default class SignatureModal extends React.Component<SignatureModalProps,
             <TextInput
               textAlignVertical="top"
               multiline
+              scrollEnabled
               style={style.textZone}
               defaultValue={this.props.signature}
               onChangeText={(text: string) => this.props.setSignature(text)}
@@ -78,9 +79,10 @@ const style = StyleSheet.create({
     marginTop: -25,
   },
   textZone: {
-    marginHorizontal: 16,
+    marginHorizontal: 10,
     borderBottomWidth: 0.5,
     borderStyle: "dotted",
     borderColor: "grey",
+    maxHeight: Dimensions.get("window").height / 4,
   },
 });

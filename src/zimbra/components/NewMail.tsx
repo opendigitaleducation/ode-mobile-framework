@@ -1,8 +1,8 @@
 import I18n from "i18n-js";
 import React from "react";
-import { ScrollView, View, StyleSheet, TextInput, ViewStyle } from "react-native";
+import { ScrollView, View, StyleSheet, TextInput, ViewStyle, Dimensions } from "react-native";
 
-import { CommonStyles, IOSShadowStyle } from "../../styles/common/styles";
+import { CommonStyles } from "../../styles/common/styles";
 import { Icon, Loading } from "../../ui";
 import ConnectionTrackingBar from "../../ui/ConnectionTrackingBar";
 import { PageContainer } from "../../ui/ContainerContent";
@@ -30,15 +30,19 @@ const styles = StyleSheet.create({
   mailPart: {
     padding: 5,
     backgroundColor: "white",
-    elevation: CommonStyles.elevation,
-    ...IOSShadowStyle,
+  },
+  lineSeparator: {
+    marginLeft: 15,
+    width: "50%",
+    borderStyle: "dashed",
+    borderBottomWidth: 1,
+    borderRadius: 1,
   },
   signatureZone: {
     backgroundColor: "white",
-    alignItems: "flex-start",
     minHeight: 40,
+    maxHeight: Dimensions.get("window").height / 3,
     paddingHorizontal: 15,
-    marginBottom: 15,
   },
 });
 
@@ -68,12 +72,7 @@ export default ({
             onSave={onDraftSave}
           />
           <Body style={{ zIndex: 1 }} value={body} onChange={onBodyChange} onSave={onDraftSave} />
-          {!!signature && (
-            <View style={styles.signatureZone}>
-              <Text>--------------------------------------</Text>
-              <Text>{signature}</Text>
-            </View>
-          )}
+          {!!signature && <Signature signature={signature} />}
         </ScrollView>
       )}
     </PageContainer>
@@ -244,6 +243,17 @@ const Body = ({ style, value, onChange, onSave }) => {
         onChangeText={text => updateCurrentValue(text)}
         onEndEditing={() => onSave()}
       />
+    </View>
+  );
+};
+
+const Signature = ({ signature }: { signature: string }) => {
+  return (
+    <View style={styles.signatureZone}>
+      <View style={styles.lineSeparator} />
+      <ScrollView style={styles.signatureZone} contentContainerStyle={{ flexGrow: 1, padding: 8 }}>
+        <Text>{signature}</Text>
+      </ScrollView>
     </View>
   );
 };
