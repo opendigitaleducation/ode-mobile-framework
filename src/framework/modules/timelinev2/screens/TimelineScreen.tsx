@@ -3,7 +3,7 @@ import { NavigationInjectedProps, NavigationFocusInjectedProps, withNavigationFo
 import I18n from "i18n-js";
 import { ThunkDispatch } from "redux-thunk";
 import { connect } from "react-redux";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import { Alert, RefreshControl, View } from "react-native";
 
 import type { IGlobalState } from "../../../../AppStore";
@@ -26,6 +26,7 @@ import { defaultNotificationActionStack, handleNotificationAction, NotifHandlerT
 import { getTimelineWorkflows } from "../timelineModules";
 import { getUserSession, IUserSession } from "../../../util/session";
 import PopupMenu from "../../../../framework/components/popupMenu";
+import { LocalFile } from "../../../util/file";
 
 // TYPES ==========================================================================================
 
@@ -83,6 +84,12 @@ export class TimelineScreen extends React.PureComponent<
     return <>
       {this.renderHeader()}
       {this.renderHeaderButton()}
+      <TouchableOpacity
+        onPress={() => LocalFile.pick({
+          source: 'documents',
+          multiple: true
+        })}
+      ><Text>Pick Document</Text></TouchableOpacity>
       <PageView path={routeName}>
         {[TimelineLoadingState.PRISTINE, TimelineLoadingState.INIT].includes(this.state.loadingState)
           ? <LoadingIndicator />
